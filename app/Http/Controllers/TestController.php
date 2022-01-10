@@ -33,7 +33,7 @@ class TestController extends Controller
     public function updateUserDetail(UpdateUserDetailRequest $request, $id)
     {
         if (!$userDetail = UserDetail::find($id))
-            return response()->json(['success' => false]);
+            return response()->json(['success' => false], 401);
 
         $userDetail->update($request->except('country'));
             
@@ -42,8 +42,10 @@ class TestController extends Controller
 
     public function deleteUser($id)
     {
-        if(!$user = User::find($id))
-            return response()->json(['success' => false]);
+        $user = User::find($id);
+
+        if(!$user || $user->detail()->exists())
+            return response()->json(['success' => false], 401);
 
         $user->delete();
 
